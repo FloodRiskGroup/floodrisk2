@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Loss of Life Assessment &#8212; FloodRisk2 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="loss-of-life-assessment">
+<h1>Loss of Life Assessment<a class="headerlink" href="#loss-of-life-assessment" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>Loss of Life Assessment</strong> window allows you to asses the map of the <strong>population at risk</strong> and the <strong>number of potential fatalities</strong> for a given <strong>SCENARIO</strong>.
+In fact, as for the economic damages also in the Loss of Life Assessment it is possible to carry out evaluations for different scenarios that are a combination of hazard and exposure.</p>
+<p>The map of the population at risk is obtained by superimposing the inundation map and the population density map.
+Once calculated the map of the population at risk, the number of potential fatalities is obtained by multiplying population at risk time the <em>fatality rate</em>.
+In addition to choosing the combination of hazard and exposure, the FloodRisk2 allows you to choose between two calculation methods of <em>fatality rate</em>:</p>
+<ol class="arabic simple">
+<li><p>Dam Failure Scenarios - U.S. Department of Homeland Security</p></li>
+<li><p>SUFRI: Methodology for pluvial and river flooding risk</p></li>
+</ol>
+<p>Once you have chosen one of the two methods, you need to select the value to be assigned to the <strong>People Understanding</strong>.
+For the meaning of the values refer to the bibliography. For SUFRI, which includes a considerable number of types, it is possible to view the table of meanings by pressing the “SUFRI table” button.
+For the case of * U.S. Department of Homeland Security * the value ** vague ** can be adopted if it is assumed that the event takes place at night and the value ** Precise ** in case it occurs during the day.</p>
+<blockquote>
+<div><img alt="_images/LossOfLIfe.jpg" src="_images/LossOfLIfe.jpg" />
+</div></blockquote>
+<p>The list of data and results is summarized below, each for each return period:</p>
+<ol class="arabic simple">
+<li><p>Data concern <strong>population</strong> and their <strong>vulnerability</strong> are stored in the geodatabase.</p></li>
+<li><p>Data concern the <strong>hazard</strong> are a map of <strong>maximum depth</strong> and <strong>maximum velocity</strong> values due to flooding.
+These data are the output from a 2D hydraulic model and are loaded into the system from any file type <strong>GDAL Raster Formats</strong></p></li>
+<li><p>Further data necessary to assess the vulnerability of the population is the map of the <strong>warning time</strong>.
+The warning time indicates the amount of time between the reception of a warning and the instant in which the population could be affected by the flood event.
+These data should be a <strong>polygons shapefile</strong> having a field called <em>“TimeHours”</em> containing the value of the warning time in hours.</p></li>
+<li><p>Results are maps of <strong>population at risk</strong> and <strong>number of potential fatalities</strong> and
+a <strong>global summary table</strong> of the results which are also displayed in graphical form (histogram).</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Layers</strong> of results for each <strong>return period</strong>.</p>
+<dl class="field-list">
+<dt class="field-odd">Population at Risk Layer <em>(*_pop.tif)</em></dt>
+<dd class="field-odd"><p>a <em>GeoTIFF File Format</em> having two output <em>bands</em>:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">band1</dt>
+<dd class="field-odd"><p><em>population density at risk</em> (people per sq. km of land area)</p>
+</dd>
+<dt class="field-even">band2</dt>
+<dd class="field-even"><p><em>loss of life density</em> (people per sq. km of land area)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt class="field-odd">Global summary table <em>(*_pop.csv)</em></dt>
+<dd class="field-odd"><p>a <em>csv File Format</em> containing the table of results grouped by <em>Range of Wather Depth</em></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Help4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, L.Mancusi/RSE S.p.A..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>

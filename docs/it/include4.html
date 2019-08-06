@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Scenario perdite di vite (LOL) &#8212; FloodRisk2 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scenari Analisi Costi Benefici" href="include5.html" />
+    <link rel="prev" title="Danni Economici Diretti" href="include3.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="include5.html" title="Scenari Analisi Costi Benefici"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="include3.html" title="Danni Economici Diretti"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="scenario-perdite-di-vite-lol">
+<h1>Scenario perdite di vite (LOL)<a class="headerlink" href="#scenario-perdite-di-vite-lol" title="Permalink to this headline">¶</a></h1>
+<p>La finestra <strong>Scenario perdite di vite (LOL)</strong> consente di valutare la mappa della <strong>popolazione a rischio</strong> ed il <strong>numero di potenziali vittime</strong> per un dato <strong>SCENARIO</strong>.
+Infatti, come per il danno economico, anche nello scenario delle perdite di vite è possible effettuare la valutazione per differenti scenari che sono la combinazione di una pericolosità e di una esposizione.</p>
+<p>La mappa della popolazione a rischio è ottenuta mediante sovrapposizione della mappa dell’inondazione e di quella della densità di popolazione.
+Dalla mappa delle popolazione a rischio si ottiene la mappa delle potenziali vittime motiplicando la popolazione a rischio per la <strong>percentuale di perdite</strong> <em>(fatality rate)</em>.
+In aggiunta alla scelta della combinazione di pericolosità ed esposizione, FloodRisk2 consente la scelta fra due possibili metodi di calcolo del <em>fatality rate</em>:</p>
+<ol class="arabic simple">
+<li><p>Dam Failure Scenarios - U.S. Department of Homeland Security</p></li>
+<li><p>SUFRI: Methodology for pluvial and river flooding risk</p></li>
+</ol>
+<p>Una volta scelto uno dei due metodi, occorre selezionare il valore da assegnare al parametro <strong>People Understanding</strong>.
+Per il significato completo del parametro si rimanda alla bibliografia, comunque per il caso del SUFRI, che è più articolato è possibile visionare la tabella <strong>“SUFRI table”</strong> premendo il relativo tasto.
+Per il caso del <em>U.S. Department of Homeland Security</em> si può assumere il valore <strong>vague</strong> se si ipotizza che l’evento avvenga di notte ed il valore <strong>Precise</strong> in caso avvenga di giorno.</p>
+<blockquote>
+<div><img alt="_images/LossOfLIfe.jpg" src="_images/LossOfLIfe.jpg" />
+</div></blockquote>
+<p>La lista dei dati e dei risultati per ogni tempo di ritorno è riportata di seguito:</p>
+<ol class="arabic simple">
+<li><p>I dati riguardanti <strong>popolazione</strong> e la loro <strong>vulnerabilità</strong> sono memorizzati nel geodatabase.</p></li>
+<li><p>I dati riguardanti il <strong>pericolo</strong> sono mappe di <strong>altezza massime</strong>  e <strong>velocità massime</strong> dovute all’inondazione.
+Questi dati sono output di modelli idraulici 2D e  sono caricarti nel sistema tramite un qualsiasi file del tipo <strong>GDAL Raster Formats</strong>.</p></li>
+<li><p>Un ulteriore dato necessario per la valutazione della vulnerabilità è la mappa dei <strong>tempi di preavviso</strong>.
+Il tempo di preavviso indica la quantità di tempo che intercorre fra la ricezione dell’avviso e l’istante in cui la popolazione è interessata dall’evento di inondazione.
+Questi dati devono essere del tipo <strong>shapefile di poligoni</strong> avente il campo <em>“TimeHours”</em> contenente il valore del tempo di prevviso in ore.</p></li>
+<li><p>I risultati sono mappe della <strong>popolazione a rischio</strong> ed in <strong>numero di potenziali vittime</strong> ed una <strong>Tabella Riassuntiva</strong> dei risultati che può essere visualizzata anche in forma grafica (istogramma).</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Layers</strong> dei risultati per ogni tempo di ritorno.</p>
+<dl class="field-list">
+<dt class="field-odd">Layer della popolazione a rishio <em>(*_pop.tif)</em></dt>
+<dd class="field-odd"><p>un file tipo <em>GeoTIFF File Format</em> avente come output due <em>bande</em>:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">band1</dt>
+<dd class="field-odd"><p><em>densità della popolazione a rischio</em> (persone per km quadrato)</p>
+</dd>
+<dt class="field-even">band2</dt>
+<dd class="field-even"><p><em>densità di perdite di vite</em> (persone per km quadrato)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt class="field-odd">Tabella Riassuntiva <em>(*_pop.csv)</em></dt>
+<dd class="field-odd"><p>un file tipo <em>csv File Format</em> contenete la tabella dei risultati raggruppato per <em>Intervalli di altezze d’acqua</em></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="include3.html"
+                        title="previous chapter">Danni Economici Diretti</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="include5.html"
+                        title="next chapter">Scenari Analisi Costi Benefici</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/include4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="include5.html" title="Scenari Analisi Costi Benefici"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="include3.html" title="Danni Economici Diretti"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, L.Mancusi/RSE S.p.A..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>

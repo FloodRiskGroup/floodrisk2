@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Project Management &#8212; FloodRisk2 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="project-management">
+<h1>Project Management<a class="headerlink" href="#project-management" title="Permalink to this headline">¶</a></h1>
+<p>The <strong>Project Management</strong> window allows you to load or create the geodatabase of the project.
+The geodatabase serves as a container of the input data.
+Below you can see an example of a project window with the chosen geodatabase and the list of input files.</p>
+<blockquote>
+<div><img alt="_images/PrjManagement.jpg" src="_images/PrjManagement.jpg" />
+</div></blockquote>
+<p>The user must choose the name of the Spatialite <strong>geodatabase (* .sqlite)</strong>.
+In the case of a new project, first create a new geodatabase using the “New file” button.
+For an existing project, select its geodatabase with the “Open file” button.</p>
+<p>Once the geodatabase has been chosen, the data can be uploaded into it.</p>
+<p>The data related to the hazard are grouped by instances, where the instances represent individual situations:
+for example the <strong>instance 0</strong> represents the current situation, the <strong>instance 1</strong> could represent the new hazard after a mitigation intervention.</p>
+<p>Once an instance has been chosen, the hazard data can be uploaded into the project for different return periods.</p>
+<p>Into the geodatabase the <strong>path</strong> of each file and its <strong>instance</strong> and <strong>return period</strong> are saved.</p>
+<p>For a given return period the hazard data consists of three files:</p>
+<ol class="arabic simple">
+<li><p><em>Water Depth Raster Layer</em></p></li>
+<li><p><em>Flow Velocity Raster Layer</em></p></li>
+<li><p><em>Warning Time Vector Layer</em></p></li>
+</ol>
+<p>By clicking the button <strong>“Add to Map Layers to Canvas”</strong> you can see in QGIS the layers that are part of the project.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Help1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, L.Mancusi/RSE S.p.A..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,517 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Database Manager &#8212; FloodRisk2 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Danni Economici Diretti" href="include3.html" />
+    <link rel="prev" title="Project Management" href="include1.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="include3.html" title="Danni Economici Diretti"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="include1.html" title="Project Management"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="database-manager">
+<h1>Database Manager<a class="headerlink" href="#database-manager" title="Permalink to this headline">¶</a></h1>
+<p>La finestra <strong>database manager</strong> consente di caricare i dati nel geodatabase <em>spatialite</em>.
+I dati salvati nel geodatabase riguardano la <strong>popolazione</strong> ed i <strong>beni a rischio</strong> e la loro <strong>vulnerabilità</strong> alle inondazioni.</p>
+<blockquote>
+<div><img alt="_images/DataBaseManager.jpg" src="_images/DataBaseManager.jpg" />
+</div></blockquote>
+<ol class="arabic">
+<li><p>La parte in alto a sinistra della finestra mostra il nome del geodatabase. Prima di inserire i dati geografici è necessario definire il loro <strong>Sistema di riferimento geografico</strong>.
+Fino a che non è caricato il <strong>Poligono Area di Studio</strong> è possible modificare il <strong>Sistema di riferimento geografico</strong>: dopo l’opzione viene disabilitata.
+Per abilitare nuovamente l’opzione occorre svuotare il geodatabase di tutti i dati geografici (tabelle <em>AnalysisArea</em>, <em>CensusBlocks</em>, <em>StructurePoly</em> and <em>InfrastrLines</em>).</p></li>
+<li><p>La parte sinistra della finestra consente di caricare i dati delle <strong>curve di vulnerabilità dell’esposto</strong>.
+Questi dati alfanumerici sono caricati da <strong>file csv</strong> aventi <strong>punto e virgola</strong> come separatore.</p>
+<p>Esempi di tabelle sono elencate sotto:</p>
+<ol class="loweralpha simple">
+<li><p><a class="reference internal" href="#tipobene">TipoBene</a></p></li>
+<li><p><a class="reference internal" href="#listatipocurvealtezzadanno">ListaTipoCurveAltezzaDanno</a></p></li>
+<li><p><a class="reference internal" href="#curvealtezzadanno">CurveAltezzaDanno</a></p></li>
+<li><p><a class="reference internal" href="#fatalityrates">FatalityRates</a></p></li>
+<li><p><a class="reference internal" href="#floodseverity">FloodSeverity</a></p></li>
+</ol>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</li>
+<li><p>La parte destra della finestra consente di caricare o aggiornare <em>i dati geografici dei beni esposti</em>.</p>
+<p>Come per i dati della pericolosità anche per l’esposizione è possible caricare nel geodatabase diverse <strong>istanze</strong>.
+L’<strong>istanza 0</strong> per convenzione rappresenta l’esposizione corrente. Altre istanze rappresentano nuove situazioni di esposizione per esempio a seguito di future urbanizzazioni.</p>
+<p>I dati di esposizione per una certa istanza sono costituiti da <strong>dati vettoriali</strong> e sono caricati da <strong>shapefiles</strong>.
+Il sistema non ha una propria scala ma è flessibile ed è in grado di trattare diverse fonti di dati: da mappe di <strong>uso del suolo</strong> con diverso grado di dettaglio fino a dettagliate <strong>mappe del tessuto urbano</strong>.
+Pertanto il dettaglio dei dati dipende dalla scala della cartografica di origine e da essa consegue la scala del risultato finale.
+I dati dei beni esposti, quindi, possono essere riferiti a grandi aree o a dettagliate mappe locali.</p>
+<p>Di seguito è riportata la lista degli shapefile:</p>
+<ol class="loweralpha simple">
+<li><p><strong>Poligono Area di Studio</strong>: shapefile di poligoni</p></li>
+<li><p><strong>Layer dei poligoni dei Beni</strong>: shapefile di poligoni avente i campi <strong>OccuType</strong> tipo <em>VARCHAR(5)</em>; <strong>Valstr</strong> tipo <em>Real</em>; <strong>Valcon</strong> tipo <em>Real</em></p></li>
+<li><p><strong>Layer vettoriale delle Infrastructure Lineari</strong>: shapefile di linee avente i campi <strong>OccuType</strong> tipo <em>VARCHAR(5)</em>; <strong>Valstr</strong> tipo <em>Real</em>; <strong>Valcon</strong> tipo <em>Real</em></p></li>
+<li><p><strong>Layer dei dati del Censimento</strong>: shapefile di poligoni avente i campi <strong>CensID</strong> tipo <em>Real</em>; <strong>Resident</strong> tipo <em>Integer</em>; <strong>Seasonal</strong> tipo <em>Integer</em></p></li>
+</ol>
+</li>
+</ol>
+<div class="section" id="esempio-di-tabella-di-tipi-di-bene">
+<span id="tipobene"></span><h2><em>Esempio di tabella di Tipi di Bene</em><a class="headerlink" href="#esempio-di-tabella-di-tipi-di-bene" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">OccupancyType</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 53%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>IND</p></th>
+<th class="head"><p>NumDomain</p></th>
+<th class="head"><p>code</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Valstr</p></th>
+<th class="head"><p>Valcon</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>10</p></td>
+<td><p>11100</p></td>
+<td><p>Continuous Urban Fabric (S.L. &gt; 80%)</p></td>
+<td><p>1520</p></td>
+<td><p>760</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>10</p></td>
+<td><p>11210</p></td>
+<td><p>Discontinuous Dense Urban Fabric (S.L. : 50% -  80%)</p></td>
+<td><p>650</p></td>
+<td><p>325</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>10</p></td>
+<td><p>11220</p></td>
+<td><p>Discontinuous Medium Density Urban Fabric (S.L. : 30% - 50%)</p></td>
+<td><p>400</p></td>
+<td><p>200</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>10</p></td>
+<td><p>11230</p></td>
+<td><p>Discontinuous Low Density Urban Fabric (S.L. : 10% - 30%)</p></td>
+<td><p>200</p></td>
+<td><p>100</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>10</p></td>
+<td><p>11240</p></td>
+<td><p>Discontinuous Very Low Density Urban Fabric (S.L. &lt; 10%)</p></td>
+<td><p>100</p></td>
+<td><p>50</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Valstr</strong> in <em>Euro/sqm</em></p>
+<p><strong>Valcon</strong> in <em>Euro/sqm</em></p>
+</div>
+<div class="section" id="esempio-di-tabella-di-listatipicurvealtezzadanno">
+<span id="listatipocurvealtezzadanno"></span><h2><em>Esempio di tabella di ListaTipiCurveAltezzaDanno</em><a class="headerlink" href="#esempio-di-tabella-di-listatipicurvealtezzadanno" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">ListDepthDamageCurve</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 89%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>VulnID</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Urban Altas Depth-Damage Curves</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="esempio-di-tabella-di-curva-altezza-danno">
+<span id="curvealtezzadanno"></span><h2><em>Esempio di tabella di curva Altezza-Danno</em><a class="headerlink" href="#esempio-di-tabella-di-curva-altezza-danno" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default" id="id3">
+<caption><span class="caption-text">DepthDamageCurves</span><a class="headerlink" href="#id3" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>VulnID</p></th>
+<th class="head"><p>OccuType</p></th>
+<th class="head"><p>DmgType</p></th>
+<th class="head"><p>VulnType</p></th>
+<th class="head"><p>HydroValue</p></th>
+<th class="head"><p>Damage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0.3048</p></td>
+<td><p>0.00</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0.7620</p></td>
+<td><p>0.10</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>0.9144</p></td>
+<td><p>0.25</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1.2192</p></td>
+<td><p>0.40</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>1.5240</p></td>
+<td><p>0.50</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>2.4384</p></td>
+<td><p>0.60</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>3.0000</p></td>
+<td><p>0.60</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>11100</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>9999.0</p></td>
+<td><p>0.60</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>HydroValue</strong> in <em>metri di altezza d’acqua</em></p>
+</div>
+<div class="section" id="esempio-di-tabella-di-fatalityrates-tasso-di-perdite-di-vite">
+<span id="fatalityrates"></span><h2><em>Esempio di tabella di FatalityRates (Tasso di Perdite di Vite)</em><a class="headerlink" href="#esempio-di-tabella-di-fatalityrates-tasso-di-perdite-di-vite" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default" id="id4">
+<caption><span class="caption-text">FatalityRates</span><a class="headerlink" href="#id4" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 29%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>FRType</p></th>
+<th class="head"><p>num</p></th>
+<th class="head"><p>Fseverity</p></th>
+<th class="head"><p>WarnTime</p></th>
+<th class="head"><p>Understanding</p></th>
+<th class="head"><p>FatRate</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>HIGHT</p></td>
+<td><p>0</p></td>
+<td><p>Vague</p></td>
+<td><p>0.75</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>HIGHT</p></td>
+<td><p>24</p></td>
+<td><p>Vague</p></td>
+<td><p>0.75</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>0</p></td>
+<td><p>Vague</p></td>
+<td><p>0.15</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>0.25</p></td>
+<td><p>Vague</p></td>
+<td><p>0.15</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>1</p></td>
+<td><p>Vague</p></td>
+<td><p>0.04</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>24</p></td>
+<td><p>Vague</p></td>
+<td><p>0.03</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>0</p></td>
+<td><p>Vague</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>0.25</p></td>
+<td><p>Vague</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>1</p></td>
+<td><p>Vague</p></td>
+<td><p>0.007</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>24</p></td>
+<td><p>Vague</p></td>
+<td><p>0.0003</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>HIGHT</p></td>
+<td><p>0</p></td>
+<td><p>Precise</p></td>
+<td><p>0.75</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>3</p></td>
+<td><p>HIGHT</p></td>
+<td><p>24</p></td>
+<td><p>Precise</p></td>
+<td><p>0.75</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>0</p></td>
+<td><p>Precise</p></td>
+<td><p>0.15</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>0.25</p></td>
+<td><p>Precise</p></td>
+<td><p>0.15</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>1</p></td>
+<td><p>Precise</p></td>
+<td><p>0.02</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>24</p></td>
+<td><p>Precise</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>0</p></td>
+<td><p>Precise</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>0.25</p></td>
+<td><p>Precise</p></td>
+<td><p>0.01</p></td>
+</tr>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>1</p></td>
+<td><p>Precise</p></td>
+<td><p>0.002</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>24</p></td>
+<td><p>Precise</p></td>
+<td><p>0.0002</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>WarnTime</strong> : in <em>ore</em></p>
+</div>
+<div class="section" id="esempio-di-tabella-floodseverity-intensita-dell-inondazione">
+<span id="floodseverity"></span><h2><em>Esempio di tabella FloodSeverity (Intensità dell’inondazione)</em><a class="headerlink" href="#esempio-di-tabella-floodseverity-intensita-dell-inondazione" title="Permalink to this headline">¶</a></h2>
+<table class="colwidths-given docutils align-default" id="id5">
+<caption><span class="caption-text">FloodSeverity</span><a class="headerlink" href="#id5" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 29%" />
+<col style="width: 24%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>num</p></th>
+<th class="head"><p>Fseverity</p></th>
+<th class="head"><p>DV (m3/s)</p></th>
+<th class="head"><p>hrate (m/5min)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>LOW</p></td>
+<td><p>5</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>MEDIUM</p></td>
+<td><p>15</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>HIGHT</p></td>
+<td><p>99999</p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Database Manager</a><ul>
+<li><a class="reference internal" href="#esempio-di-tabella-di-tipi-di-bene"><em>Esempio di tabella di Tipi di Bene</em></a></li>
+<li><a class="reference internal" href="#esempio-di-tabella-di-listatipicurvealtezzadanno"><em>Esempio di tabella di ListaTipiCurveAltezzaDanno</em></a></li>
+<li><a class="reference internal" href="#esempio-di-tabella-di-curva-altezza-danno"><em>Esempio di tabella di curva Altezza-Danno</em></a></li>
+<li><a class="reference internal" href="#esempio-di-tabella-di-fatalityrates-tasso-di-perdite-di-vite"><em>Esempio di tabella di FatalityRates (Tasso di Perdite di Vite)</em></a></li>
+<li><a class="reference internal" href="#esempio-di-tabella-floodseverity-intensita-dell-inondazione"><em>Esempio di tabella FloodSeverity (Intensità dell’inondazione)</em></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="include1.html"
+                        title="previous chapter">Project Management</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="include3.html"
+                        title="next chapter">Danni Economici Diretti</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/include2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="include3.html" title="Danni Economici Diretti"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="include1.html" title="Project Management"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, L.Mancusi/RSE S.p.A..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>

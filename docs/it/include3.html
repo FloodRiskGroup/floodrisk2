@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Danni Economici Diretti &#8212; FloodRisk2 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scenario perdite di vite (LOL)" href="include4.html" />
+    <link rel="prev" title="Database Manager" href="include2.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="include4.html" title="Scenario perdite di vite (LOL)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="include2.html" title="Database Manager"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="danni-economici-diretti">
+<h1>Danni Economici Diretti<a class="headerlink" href="#danni-economici-diretti" title="Permalink to this headline">¶</a></h1>
+<p>La finestra <strong>Danni Economici Diretti</strong> consente di stimare il danno economico diretto atteso per le strutture e per il contenuto dei beni a rishio.</p>
+<blockquote>
+<div><img alt="_images/DirectEconomicDamage.jpg" src="_images/DirectEconomicDamage.jpg" />
+</div></blockquote>
+<p>Siccome il plug-in consente di valutare diverse <strong>istanze</strong> sia per la <strong>pericolosità</strong> che per l’<strong>esposizone</strong>, ogni calcolo deve essere riferito ad una combinazione dei due, che chiamiamo <strong>scenario</strong>.
+Per esempio lo <strong>scenario</strong> della situazione corrente, detto <strong>“SCENARIO 0”</strong>, è la combinazione della <strong>“istanza 0”</strong> della <strong>pericolosità</strong> con l’<strong>”istanza 0”</strong> dell’esposizone.
+La definizione dello <strong>scenario</strong> è completata mediante la scelta, tramite il combobox <strong>“VULNERABILITA’”</strong>, del <strong>tipo di curve di vulnerabilità</strong> da adottare per il calcolo.</p>
+<p>Inoltre, siccome per ogni <strong>pericolosità</strong> ci sono differento <strong>tempi di ritorno</strong>, il plug-in ricorsivamente esegue il calcolo per ogni <strong>tempo di ritorno</strong>.
+Nella parte bassa dell’interfaccia è possible scegliere ad uno ad uno i singoli <strong>tempi di ritorno</strong> di cui che si vogliono visualizzare in mappa i risultati.</p>
+<p>Riassumendo, scelto uno SCENARIO, i dati utilizzati sono i seguenti:</p>
+<ol class="arabic simple">
+<li><p>Dati sui <strong>beni a rischio</strong> e la loro <strong>vulnerabilità</strong> (depth-damage curves) salvati nel geodatabase.</p></li>
+<li><p>Dati concernenti la <strong>pericolosità</strong> sono mappe delle <strong>massime altezze d’acqua</strong> dovute all’inondazione (una per ogni tempo di ritorno).
+Questi dati sono l’output di un modello idraulico 2D e sono caricati nel sistema sotto forma di file del tipo <strong>GDAL Raster Formats</strong></p></li>
+<li><p>Il database può contenere differenti dipi di curve altezza-danno: prima di eseguire il calcolo occorre scegliere il tipo di <strong>VULNERABILITA’</strong> fra quelle disponibili ed è possibile visionare il <strong>Grafico</strong>.</p></li>
+<li><p>I risultati sono mappe di <strong>danno</strong> e <strong>vulnerabilità</strong> per edifici residenziali, commerciali, ed industriali ed una <strong>Tabella Riassuntiva</strong> dei risultati che può essere mostrata anche in forma grafica (istogramma).</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Layers</strong> dei risultati per ogni tempo di ritorno.</p>
+<dl class="field-list">
+<dt class="field-odd">Layer dei danni <em>(*_dmg.tif)</em></dt>
+<dd class="field-odd"><p>un file tipo <em>GeoTIFF File Format</em> avente come output due <em>bande</em></p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">band1</dt>
+<dd class="field-odd"><p><em>danni economici</em> attesi per le strutture (Euro al metro quadro)</p>
+</dd>
+<dt class="field-even">band2</dt>
+<dd class="field-even"><p><em>danni economici</em> attesi per il contenuto (Euro al metro quadro)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt class="field-odd">Layer della vulnerabilità <em>(*_vuln.tif)</em></dt>
+<dd class="field-odd"><p>un file tipo <em>GeoTIFF File Format</em> avente come output due <em>bands</em>:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">band1</dt>
+<dd class="field-odd"><p><em>vulnerabilità</em> per le strutture (% di danno)</p>
+</dd>
+<dt class="field-even">band2</dt>
+<dd class="field-even"><p><em>vulnerabilità</em> per le contenuto (% di danno)</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt class="field-odd">Tabella Riassuntiva <em>(*_dmg.csv)</em></dt>
+<dd class="field-odd"><p>un file tipo <em>csv File Format</em> contenete la tabella dei risultati raggruppato per <em>classi di beni</em></p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="include2.html"
+                        title="previous chapter">Database Manager</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="include4.html"
+                        title="next chapter">Scenario perdite di vite (LOL)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/include3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="include4.html" title="Scenario perdite di vite (LOL)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="include2.html" title="Database Manager"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">FloodRisk2 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, L.Mancusi/RSE S.p.A..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>
