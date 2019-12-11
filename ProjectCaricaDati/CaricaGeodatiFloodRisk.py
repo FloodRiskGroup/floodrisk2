@@ -958,19 +958,22 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
                 for row in rows:
                     ListOccuTypeVuln.append(row[0])
 
-                NameLayer=os.path.basename(ShpBeniAreali)
-                NameLayer=str(NameLayer.split('.')[0])
+                #NameLayer=os.path.basename(ShpBeniAreali)
+                #NameLayer=str(NameLayer.split('.')[0])
+                NameLayer=Inlayer.GetName()
 
-                sql="SELECT DISTINCT %s FROM %s" % (NameOccuTypeShp,NameLayer)
+                #sql="SELECT DISTINCT %s FROM %s" % (NameOccuTypeShp,NameLayer)
+                sql="SELECT %s FROM %s" % (NameOccuTypeShp,NameLayer)
                 result = inDS.ExecuteSQL(sql)
 
                 if result!=None:
                     resultFeat = result.GetNextFeature()
-                    ListOccuTypeInput=[]
+                    ListOccuTypeInput_tmp=[]
 
                     while resultFeat:
-                        ListOccuTypeInput.append(resultFeat.GetField(0))
+                        ListOccuTypeInput_tmp.append(resultFeat.GetField(0))
                         resultFeat = result.GetNextFeature()
+                    ListOccuTypeInput=set(ListOccuTypeInput_tmp)
 
                     inDS.ReleaseResultSet(result)
                 else:
@@ -1171,18 +1174,21 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
                 for row in rows:
                     ListOccuTypeVuln.append(row[0])
 
-                NameLayer=os.path.basename(ShpBeniLineari)
-                NameLayer=str(NameLayer.split('.')[0])
-                sql="SELECT DISTINCT %s FROM %s" % (NameOccuTypeShp,NameLayer)
+                #NameLayer=os.path.basename(ShpBeniLineari)
+                #NameLayer=str(NameLayer.split('.')[0])
+                NameLayer=Inlayer.GetName()
+                #sql="SELECT DISTINCT %s FROM %s" % (NameOccuTypeShp,NameLayer)
+                sql="SELECT %s FROM %s" % (NameOccuTypeShp,NameLayer)
                 result = inDS.ExecuteSQL(sql)
 
                 if result!=None:
                     resultFeat = result.GetNextFeature()
-                    ListOccuTypeInput=[]
+                    ListOccuTypeInput_tmp=[]
 
                     while resultFeat:
-                        ListOccuTypeInput.append(resultFeat.GetField(0))
+                        ListOccuTypeInput_tmp.append(resultFeat.GetField(0))
                         resultFeat = result.GetNextFeature()
+                    ListOccuTypeInput=set(ListOccuTypeInput_tmp)
 
                     inDS.ReleaseResultSet(result)
                 else:
