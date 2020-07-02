@@ -747,14 +747,17 @@ def AssessConsequencesPopulation(Lista,app,ini,fin):
     LimAlt=DvFlooSev
     numerolim=len(LimAlt)
     numcel=numpy.zeros(numerolim,numpy.int32)
-    mask_alt=numpy.zeros((numerolim,rows,cols),numpy.bool)
+##    mask_alt=numpy.zeros((numerolim,rows,cols),numpy.bool)
+    mask_alt=numpy.zeros((numerolim,rows,cols),numpy.int)
     # in nodata points of Flow Rate insert the upper limit
     # to avoid being counted as less than the minimum
     MaxLim=LimAlt[numerolim-1]+1
     mask_tmp=numpy.choose(mask_not_wet,(DV,MaxLim))
 
     # [0] is the mask with values below the minimum flow rate
-    mask_alt[0]=numpy.less(mask_tmp, LimAlt[0])
+##    mask_alt[0]=numpy.less(mask_tmp, LimAlt[0])
+    tmp=numpy.less(mask_tmp, LimAlt[0])*1
+    mask_alt[0]=tmp
     FloodSeverityID=numpy.choose(numpy.equal(mask_alt[0],1),(FloodSeverityID,ID_FloodSeverity[0]))
 
     # count the number of cells
@@ -762,8 +765,10 @@ def AssessConsequencesPopulation(Lista,app,ini,fin):
 
     for i in range (1,numerolim):
         # each mask indicates the cells that have a value lower than the limit
-        mask_alt[i]=numpy.less(mask_tmp, LimAlt[i])
-        mask_alt[i]=mask_alt[i]*1
+##        mask_alt[i]=numpy.less(mask_tmp, LimAlt[i])
+##        mask_alt[i]=mask_alt[i]*1
+        tmp=numpy.less(mask_tmp, LimAlt[i])
+        mask_alt[i]=tmp*1
         nn=numpy.sum(mask_alt[i])
 
         for j in range (i):
