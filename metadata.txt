@@ -10,7 +10,7 @@
 name=FloodRisk2
 qgisMinimumVersion=3.0
 description=This plugin assist authorities for flood risk analysis and management
-version=0.2
+version=0.3
 author=L.Mancusi - RSE S.p.A.
 email=leonardo.mancusi@rse-web.it
 
