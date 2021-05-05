@@ -48,7 +48,7 @@ from time import sleep
 
 ##import CreaGeodatabase
 # import CaricaGeodatiFloodRisk
-from .CaricaGeodatiFloodRisk import mainCaricaGeodatiFloodRisk                  # import script
+from .CaricaGeodatiFloodRisk_1 import mainCaricaGeodatiFloodRisk                  # import script
 
 # import CaricaCurve
 from .CaricaCurve import mainCaricaCurve                                        # import script
