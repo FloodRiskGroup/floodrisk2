@@ -329,36 +329,42 @@ class CalcolaDanno_Dialog(QDialog, FORM_CLASS):
         self.s5 = str(self.comboBoxGrafici.currentText())
         self.s6 = self.ProcessaStringaVuln(self.s5)
 
-        if self.s1 !="":
-            self.NomeFileSQLITE = str(self.txtShellFilePath_2.text())
-            self.conn = sqlite3.connect(self.NomeFileSQLITE, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-            self.cur = self.conn.cursor()
-            sql = "SELECT OBJECTID FROM DAMAGESCENARIOS WHERE Numscenario=%s OR (HazardInstance=%s AND ExposureInstance=%s AND VulnID=%s); " % (self.s1, self.s3, self.s4, self.s6)
-            self.cur = self.conn.execute(sql)
-            ListOBJ = self.cur.fetchone()
+        if not self.s1.isnumeric():
+            msg=self.tr("Error, SCENARIO must be a numeric value ! ")
+            QMessageBox.information(None, "Message", msg)
 
-            if ListOBJ != None:
-                quit_msg = self.tr("This record already exists, do you want to overwrite it?")
-                reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes | QMessageBox.No)
+        else:
+            if self.s1 !="":
 
-                if reply == QMessageBox.Yes:
-                    sql = "UPDATE DAMAGESCENARIOS SET Numscenario = %s, HazardInstance = %s, ExposureInstance = %s, VulnID = %s, Description = '%s' WHERE OBJECTID=%d;" % (self.s1, self.s3, self.s4, self.s6, self.s2,ListOBJ[0])
+                self.NomeFileSQLITE = str(self.txtShellFilePath_2.text())
+                self.conn = sqlite3.connect(self.NomeFileSQLITE, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+                self.cur = self.conn.cursor()
+                sql = "SELECT OBJECTID FROM DAMAGESCENARIOS WHERE Numscenario=%s OR (HazardInstance=%s AND ExposureInstance=%s AND VulnID=%s); " % (self.s1, self.s3, self.s4, self.s6)
+                self.cur = self.conn.execute(sql)
+                ListOBJ = self.cur.fetchone()
+
+                if ListOBJ != None:
+                    quit_msg = self.tr("This record already exists, do you want to overwrite it?")
+                    reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes | QMessageBox.No)
+
+                    if reply == QMessageBox.Yes:
+                        sql = "UPDATE DAMAGESCENARIOS SET Numscenario = %s, HazardInstance = %s, ExposureInstance = %s, VulnID = %s, Description = '%s' WHERE OBJECTID=%d;" % (self.s1, self.s3, self.s4, self.s6, self.s2,ListOBJ[0])
+                        self.cur.execute(sql)
+
+                        sql = "DELETE FROM FreqDamage WHERE Numscenario = %s" % (self.s1)
+                        self.cur.execute(sql)
+                else:
+                    sql = "INSERT INTO DAMAGESCENARIOS (Numscenario, HazardInstance, ExposureInstance, VulnID, Description) VALUES (%s,%s,%s,%s,'%s'); "  %  (self.s1, self.s3, self.s4, self.s6, self.s2)
                     self.cur.execute(sql)
-
-                    sql = "DELETE FROM FreqDamage WHERE Numscenario = %s" % (self.s1)
-                    self.cur.execute(sql)
-            else:
-                sql = "INSERT INTO DAMAGESCENARIOS (Numscenario, HazardInstance, ExposureInstance, VulnID, Description) VALUES (%s,%s,%s,%s,'%s'); "  %  (self.s1, self.s3, self.s4, self.s6, self.s2)
-                self.cur.execute(sql)
-                self.comboBox_7.addItem(self.s1)                        # Combo Scenario
-                self.comboBox_9.addItem(self.s1)                        # Combo Scenario VOD
+                    self.comboBox_7.addItem(self.s1)                        # Combo Scenario
+                    self.comboBox_9.addItem(self.s1)                        # Combo Scenario VOD
 
 
-        self.conn.commit()
-        self.conn.close()
-        self.txtShellFilePath_5.setText("")
-        self.txtShellFilePath_6.setText("")
-        self.txtShellFilePath_7.setText("")
+            self.conn.commit()
+            self.conn.close()
+            self.txtShellFilePath_5.setText("")
+            self.txtShellFilePath_6.setText("")
+            self.txtShellFilePath_7.setText("")
 
     def ProcessaStringaVuln(self,sStringa):                             # Tolgo il numero dalla stringa
         a1 = sStringa.find(' - ')
@@ -371,6 +377,10 @@ class CalcolaDanno_Dialog(QDialog, FORM_CLASS):
 
         # creo un oggetto unicode : esso ha il metodo isnumeric() per verificare se e' un numero
         ScenarioUnicode =u'%s' % self.comboBox_7.currentText()
+
+        # current VulnID value in the form
+        self.s5 = str(self.comboBoxGrafici.currentText())
+        VulnID_form = int(self.ProcessaStringaVuln(self.s5))
 
         # controllo se esiste il database e se nel combo dello scenario c'e' un numero
         if os.path.exists(self.NomeFileSQLITE) and ScenarioUnicode.isnumeric():
@@ -388,6 +398,17 @@ class CalcolaDanno_Dialog(QDialog, FORM_CLASS):
                 HazardInstance=record[0]
                 ExposureInstance=record[1]
                 VulnID=record[2]
+
+                if VulnID!=VulnID_form:
+                    quit_msg = self.tr("Current vulnerability differs from the one saved on scenario, do you want to overwrite saved value?")
+                    reply = QMessageBox.question(self, 'Message', quit_msg, QMessageBox.Yes | QMessageBox.No)
+
+                    if reply == QMessageBox.Yes:
+                        VulnID=VulnID_form
+                        sql = "UPDATE DAMAGESCENARIOS SET VulnID = %d WHERE  Numscenario=%d" % (VulnID,CurrentScenarioInt)
+                        cur.execute(sql)
+                        conn.commit()
+
 
                 # crea la lista degli input per lo script che calcola lo scenario
                 InputList=[]

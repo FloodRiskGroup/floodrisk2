@@ -42,7 +42,8 @@ import sqlite3
 
 spatialRef = osr.SpatialReference()
 
-from .CreaGridBeni import CalcoloValori
+##from .CreaGridBeni import CalcoloValori
+from .CreaGridBeni_1 import CalcoloValori
 
 def CaricaCodedDomains(DBfile):
     consql = sqlite3.connect(DBfile, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -68,15 +69,6 @@ def CaricaCodedDomains(DBfile):
     consql.close()
 
     return Codici, Descrizione
-
-def LoadParametro(testo):
-    text=testo[:-1]
-    pp=str(text).split('=')
-    parametro=pp[1]
-    # remove spaces before and after the text
-    parametro=parametro.lstrip()
-    parametro=parametro.rstrip()
-    return parametro
 
 def CalcDamage(FileDEM1,DBfile,ListaDatiBeni,ListaFileOutput,app,ini,fin):
     # ------------------------------------------------------------------
@@ -563,25 +555,25 @@ def mainScenarioDanno(InputList,app):
     app.setValue(int(curr))
 
     # -------------------------------------
-    # ciclo per i diversi tempi di ritorno
+    # loop for the different return times
     # -------------------------------------
 
     for rec in ListaTr:
 
 
-        # valore del tempo di ritorno
+        # return time value
         Tr=rec[0]
 
         # initializes progressbar
         txt='%s = %d' % ('Time Return Period',Tr)
         app.setFormat(txt +': %p%')
 
-        # seleziona il file delle altezze d'acqua per il tempo di ritorno Tr
+        # selecting the water depth file for the return time Tr
         sql='SELECT Path FROM HazardFiles WHERE instance=%d AND YearReturnPeriod=%d AND Type=1;' % (HazardInstance,Tr)
         cur.execute(sql)
         ListaFile=cur.fetchall()
         if ListaFile!=None:
-            # grid altezze d'acqua
+            # grid of water depth
             FileDEM1=ListaFile[0][0]
         else:
             errMsg = 'HazardInstance=%d Tr=%d missing WaterDepth grid ' % (HazardInstance,Tr)
@@ -589,7 +581,7 @@ def mainScenarioDanno(InputList,app):
             return NotErr, errMsg,TotalDamage
 
 
-        # calcola Grid dei beni congruente con la grid delle altezze d'acqua
+        # calculates grid of goods at the same resolution as the grid of water depth
         NotErr, errMsg,ListaCodici, valori, TipiArray, GridValoreStr, GridValoreCon, Nodata, AreaCella = CalcoloValori(FileDEM1,NomeFileSQLITE,app,ini,fin)
 
         if NotErr:
@@ -684,22 +676,3 @@ def mainScenarioDanno(InputList,app):
     return NotErr, errMsg,DicTotalDamage
 
 
-if __name__ == '__main__':
-
-    # Prepara i dati di input
-    NomeFileSQLITE='D:\\FloodRisk_2_data\\GDB_EsempioFloodrisk2.sqlite'
-    CurrentScenarioInt=0
-    HazardInstance=0
-    ExposureInstance=0
-    VulnID=1
-
-    InputList=[]
-    InputList.append(NomeFileSQLITE)
-    InputList.append(CurrentScenarioInt)
-    InputList.append(HazardInstance)
-    InputList.append(ExposureInstance)
-    InputList.append(VulnID)
-
-    NotErr, errMsg,DicTotalDamage = main(InputList,app)
-
-    print (DicTotalDamage)
