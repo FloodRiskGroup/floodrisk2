@@ -324,7 +324,8 @@ class Grafici_Dialog(QDialog, FORM_CLASS):
 
             E3 = float(self.lineEdit_1.text())                                                          # Intervent Cost
             E4 = float(self.lineEdit_2.text())                                                          # Annual maintenance
-            E5 = float(self.lineEdit_3.text())                                                          # Discount Rate
+            E5Perc = float(self.lineEdit_3.text())                                                      # PercentDiscount Rate
+            E5 = float(self.lineEdit_3.text())/100.0                                                    # Discount Rate
             E6 = float(self.lineEdit_4.text())                                                          # Intervent Life
             E7 = float(AES1) - float(AES2)                                                              # Annual Benefit
             E8 = E7*((1.0+E5)**E6-1.0)/E5/(1.0+E5)**E6-E3-E4*((1.0+E5)**E6-1.0)/E5/(1.0+E5)**E6         # NPV (Net Present Value)
@@ -334,7 +335,7 @@ class Grafici_Dialog(QDialog, FORM_CLASS):
             self.label_sr_8.setText("Euro: " + str(s))                                                  # Result
             s = '{:0.2f}'.format(float(E9))
             self.label_sr_9.setText("adim: " + str(s))                                                  # Result
-            self.EE1=E1; self.EE2=E2; self.EE3=E3; self.EE4=E4; self.EE5=E5; self.EE6=E6; self.EE7=E7; self.EE8=E8; self.EE9=E9; self.EE10=E10
+            self.EE1=E1; self.EE2=E2; self.EE3=E3; self.EE4=E4; self.EE5=E5Perc; self.EE6=E6; self.EE7=E7; self.EE8=E8; self.EE9=E9; self.EE10=E10
             return True
         except:
             self.label_sr_8.setText("")                                                                 # Result
@@ -373,7 +374,8 @@ class Grafici_Dialog(QDialog, FORM_CLASS):
 
             P3 = float(self.lineEdit_5.text())                                                          # Intervent Cost
             P4 = float(self.lineEdit_6.text())                                                          # Annual maintenance Cost
-            P5 = float(self.lineEdit_7.text())                                                          # Discount Rate
+            P5Perc = float(self.lineEdit_7.text())                                                      # PercentDiscount Rate
+            P5 = float(self.lineEdit_7.text())/100.0                                                    # Discount Rate
             P6 = float(self.lineEdit_8.text())                                                          # Intervent Life
             P7 = (P3+P4*((1.0+P5)**P6-1.0)/P5/(1.0+P5)**P6)/P6                                          # Annualised Cost
             P8 = float(APS1) - float(APS2)                                                              # Annual Benefit
@@ -381,7 +383,7 @@ class Grafici_Dialog(QDialog, FORM_CLASS):
             P10 = str(self.comboBox_15.currentText())                                                   # Description
             s = '{:0.2f}'.format(float(P9))
             self.label_sr_10.setText("Euro: " + str(s))                                                 # Result
-            self.PP1=P1; self.PP2=P2; self.PP3=P3; self.PP4=P4; self.PP5=P5; self.PP6=P6; self.PP7=P7; self.PP8=P8; self.PP9=P9; self.PP10=P10
+            self.PP1=P1; self.PP2=P2; self.PP3=P3; self.PP4=P4; self.PP5=P5Perc; self.PP6=P6; self.PP7=P7; self.PP8=P8; self.PP9=P9; self.PP10=P10
             return True
         except:
             self.label_sr_10.setText("")                                                                # Result
