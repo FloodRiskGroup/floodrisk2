@@ -185,6 +185,8 @@ def CaricaInMemLaySqlite(NomeTabella,curs,ListaCodici,NomeCampoTipo,ListaCampi,d
 
 
 def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
+
+
     # tolerance below which consider water depth nothing
     # --------------------------------------------------
     TOLL_H=0.000001
@@ -205,8 +207,8 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
     curr=ini
     app.setValue(int(curr))
 
-    # legge i dati delle altezze d'acqua
-    #===================================
+    # reading the values ​​of the water depth
+    #======================================
     indataset = gdal.Open( FileDEM1, GA_ReadOnly )
 
     if indataset is None:
@@ -263,6 +265,29 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
 
     TabGeom=['StructurePoly','InfrastrLines']
 
+    # create the dictionary between name and number of the layers
+    # --------------------------------------------------------------------
+
+    # reading the SQlite / Spatialite geodatabase via ogr's 'SQLite' driver
+    driver_sqlite= ogr.GetDriverByName('SQLite')
+    inDS = driver_sqlite.Open(DBfile)
+
+    numLayers = inDS.GetLayerCount()
+
+    # search for the number corresponding to the layers of interest
+    NameNumTab={}
+
+    for layerNum in range(numLayers):
+        layer = inDS.GetLayer(layerNum)
+        if layer.GetName() == TabGeom[0]:
+            NameNumTab[TabGeom[0]]=layerNum
+        if layer.GetName() == TabGeom[1]:
+            NameNumTab[TabGeom[1]]=layerNum
+    layer = None
+
+    # Close the data source
+    inDS = None
+
     # connencting to the database
     conn = sqlite3.connect(DBfile, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
     conn.enable_load_extension(True)
@@ -287,8 +312,8 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
         return NotErr, errMsg, ListaCodici, matrice, gridtipi, GridValoreStr, GridValoreCon,inNoData, AreaCella
 
 
-    # creating the list of codes in the table StructurePoly
-    #------------------------------------------------------------
+    # creating the list of OccuType codes in the table StructurePoly
+    #--------------------------------------------------------------
     sql='SELECT OccuType FROM StructurePoly GROUP BY OccuType;'
     cursor.execute(sql)
     lista=cursor.fetchall()
@@ -303,8 +328,8 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
         NotErr=bool()
         return NotErr, errMsg, ListaCodici, matrice, gridtipi, GridValoreStr, GridValoreCon,inNoData, AreaCella
 
-    # creating the list of codes in the table InfrastrLines
-    #-------------------------------------------------------
+    # creating the list of OccuType codes in the table InfrastrLines
+    #---------------------------------------------------------------
     sql='SELECT OccuType FROM InfrastrLines GROUP BY OccuType;'
     cursor.execute(sql)
     lista=cursor.fetchall()
@@ -328,17 +353,79 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
     curr=int(ini+(fin-ini)/10.0)
     app.setValue(curr)
 
-    # connecting to SQlite Geodatabase
-    # conn = db.connect(DBfile)
-    conn = sqlite3.connect(DBfile,detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-    conn.enable_load_extension(True)
-    conn.execute("SELECT load_extension('mod_spatialite')")
-    curs = conn.cursor()
     listatabelle=[]
+
+    NomeCampoTipo='OccuType'
 
     # ======================================
     # load into memory all type StructurePoly
     # ======================================
+
+    inDS = driver_sqlite.Open(DBfile,0)
+
+    # open il layer
+    layer_0 = inDS.GetLayer(NameNumTab[TabGeom[0]])
+    layer_geom_type=layer_0.GetGeomType()
+
+    # create an output datasource in memory
+    outdriver=ogr.GetDriverByName('MEMORY')
+    source=outdriver.CreateDataSource('memData')
+
+    # open the memory datasource with write access
+    tmp=outdriver.Open('memData',1)
+
+    # copy a layer to memory
+    layer_mem_0=source.CopyLayer(layer_0,TabGeom[0],['OVERWRITE=YES'])
+
+    # creating fields type
+    fieldDefn = ogr.FieldDefn('Tipo', ogr.OFTInteger)
+    layer_mem_0.CreateField(fieldDefn)
+
+    for feature in layer_mem_0:
+
+        StrCodice=feature.GetField(NomeCampoTipo)
+        try:
+            itipo=ListaCodici.index(StrCodice)+1
+        except:
+            itipo=0
+        feature.SetField('Tipo',itipo)
+
+        # update feature
+        layer_mem_0.SetFeature(feature)
+
+    # =======================================
+    # load into memory all type InfrastrLines
+    # =======================================
+
+    # open il layer
+    layer_1 = inDS.GetLayer(NameNumTab[TabGeom[1]])
+    layer_geom_type=layer_1.GetGeomType()
+
+    #create an output datasource in memory
+    outdriver=ogr.GetDriverByName('MEMORY')
+    source1=outdriver.CreateDataSource('memData1')
+
+    #open the memory datasource with write access
+    tmp1=outdriver.Open('memData1',1)
+
+    #copy a layer to memory
+    layer_mem_1=source.CopyLayer(layer_1,TabGeom[1],['OVERWRITE=YES'])
+
+    # creating fields type
+    fieldDefn = ogr.FieldDefn('Tipo', ogr.OFTInteger)
+    layer_mem_1.CreateField(fieldDefn)
+
+    for feature in layer_mem_1:
+
+        StrCodice=feature.GetField(NomeCampoTipo)
+        try:
+            itipo=ListaCodici.index(StrCodice)+1
+        except:
+            itipo=0
+        feature.SetField('Tipo',itipo)
+
+        # update feature
+        layer_mem_1.SetFeature(feature)
 
     # Creating the layer
     # ---------------
@@ -352,47 +439,14 @@ def CalcoloValori(FileDEM1,DBfile,app,ini,fin):
             driver.DeleteDataSource(nomeshpText)
 
         dst_ds = driver.CreateDataSource(nomeshpText)
+        layer_test=dst_ds.CopyLayer(layer_mem_0,'Test',['OVERWRITE=YES'])
 
         if dst_ds is None:
             print ('Could not create file')
             sys.exit(1)
-    else:
-        drv = ogr.GetDriverByName( 'Memory' )
-        dst_ds = drv.CreateDataSource( 'out' )
-
+        dst_ds = None
 
     ListaCampi=['Valstr','Valcon']
-    NomeCampoTipo='OccuType'
-    nnll=0
-    iii=curr
-
-    for NomeTabella in TabGeom:
-        listatabelle.append(NomeTabella)
-
-        if NomeTabella==TabGeom[0]:
-            fff=iii+(fin-ini)/10.0*7.0
-            layer_mem_0=CaricaInMemLaySqlite(NomeTabella,curs,ListaCodici,NomeCampoTipo,ListaCampi,dst_ds,app,iii,fff)
-            iii=fff
-
-            if layer_mem_0==None:
-                NotErr=bool()
-                errMsg =  '%s Table is Empty !!' % NomeTabella
-                return NotErr, errMsg, ListaCodici, matrice, gridtipi, GridValoreStr, GridValoreCon,inNoData, AreaCella
-
-        if NomeTabella==TabGeom[1]:
-            fff=iii+(fin-ini)/10.0
-            layer_mem_1=CaricaInMemLaySqlite(NomeTabella,curs,ListaCodici,NomeCampoTipo,ListaCampi,dst_ds,app,iii,fff)
-            iii=fff
-
-            if layer_mem_1==None and layer_mem_0==None:
-                NotErr=bool()
-                errMsg =  '%s Table is Empty !!' % NomeTabella
-                return NotErr, errMsg, ListaCodici, matrice, gridtipi, GridValoreStr, GridValoreCon,inNoData, AreaCella
-
-    # closing the database connection
-    curs.close()
-    conn.close()
-
 
     if layer_mem_1!=None:
         # Creating the mask type linear

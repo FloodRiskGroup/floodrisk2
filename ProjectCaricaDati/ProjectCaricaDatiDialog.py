@@ -32,23 +32,12 @@ from PyQt5.QtCore import *
 from qgis.core import *
 from qgis.gui import *
 
-# from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton, QDialog
-# from PyQt5.QtGui import QIcon, QImage
-# from PyQt5.QtCore import pyqtSlot
-# ============================================================================================
-
-
-# from qgis.core import QgsCoordinateReferenceSystem
-
-
-# from qgis.gui import QgsProjectionSelectionWidget
-# from qgis.gui import QgsGenericProjectionSelector
 
 from time import sleep
 
 ##import CreaGeodatabase
 # import CaricaGeodatiFloodRisk
-from .CaricaGeodatiFloodRisk_1 import mainCaricaGeodatiFloodRisk                  # import script
+from .CaricaGeodatiFloodRisk import mainCaricaGeodatiFloodRisk                  # import script
 
 # import CaricaCurve
 from .CaricaCurve import mainCaricaCurve                                        # import script
@@ -157,40 +146,24 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         self.nomeFileSQlite = str(self.txtShellFilePath.text())
 
         # initialize actions
-        # QObject.connect(self.txtShellFilePath, SIGNAL("textChanged(QString)"), self.setNameFileSQlite)
-        # self.txtShellFilePath.editingFinished.connect(self.setNameFileSQlite)
         self.txtShellFilePath.textChanged.connect(self.setNameFileSQlite)
 
-        # QObject.connect(self.btnChooseShellFile_1, SIGNAL("clicked()"), self.setFileSql)
-
-        # QObject.connect(self.btnChooseShellFile_2, SIGNAL("clicked()"), self.openSystem)
         self.btnChooseShellFile_2.pressed.connect(self.openSystem)
 
-        #Shp
-        #QObject.connect(self.btnChooseShellFile_4, SIGNAL("clicked()"), self.setAreaStudio)
         self.btnChooseShellFile_4.pressed.connect(self.setAreaStudio)
 
-        # QObject.connect(self.btnChooseShellFile_5, SIGNAL("clicked()"), self.setCensimento)
         self.btnChooseShellFile_5.pressed.connect(self.setCensimento)
 
-##        QObject.connect(self.btnChooseShellFile_9, SIGNAL("clicked()"), self.setCensimentoXls)
-
-        # QObject.connect(self.btnChooseShellFile_6, SIGNAL("clicked()"), self.setBeniAreali)
         self.btnChooseShellFile_6.pressed.connect(self.setBeniAreali)
 
-        # QObject.connect(self.btnChooseShellFile_7, SIGNAL("clicked()"), self.setBeniLineari)
         self.btnChooseShellFile_7.pressed.connect(self.setBeniLineari)
 
-        # QObject.connect(self.btnChooseShellFile_8, SIGNAL("clicked()"), self.caricaGeoDati)
         self.btnChooseShellFile_8.pressed.connect(self.caricaGeoDati)
 
-        # QObject.connect(self.btnChooseShellFile_9, SIGNAL("clicked()"), self.CaricaLayers1)
         self.btnChooseShellFile_9.pressed.connect(self.CaricaLayers1)
 
-        # QObject.connect(self.btnChooseShellFile_10, SIGNAL("clicked()"), self.CaricaLayers2)
         self.btnChooseShellFile_10.pressed.connect(self.CaricaLayers2)
 
-        # QObject.connect(self.btnChooseShellFile_11, SIGNAL("clicked()"), self.CaricaLayers3)
         self.btnChooseShellFile_11.pressed.connect(self.CaricaLayers3)
 
         self.comboBox_6.currentIndexChanged.connect(self.selectComboInstance)
@@ -201,20 +174,14 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         self.checkBox_4.stateChanged.connect(self.setCheckBL)
         self.checkBox_All.stateChanged.connect(self.setCheckAll)
 
-        #Csv
-        # QObject.connect(self.btnChooseShellFile_16, SIGNAL("clicked()"), self.setFatalityR)
         self.btnChooseShellFile_16.pressed.connect(self.setFatalityR)
 
-        # QObject.connect(self.btnChooseShellFile_17, SIGNAL("clicked()"), self.setFloodS)
         self.btnChooseShellFile_17.pressed.connect(self.setFloodS)
 
-        # QObject.connect(self.btnChooseShellFile_21, SIGNAL("clicked()"), self.setTipoV)
         self.btnChooseShellFile_21.pressed.connect(self.setTipoV)
 
-        # QObject.connect(self.btnChooseShellFile_18, SIGNAL("clicked()"), self.setVulnerabilita)
         self.btnChooseShellFile_18.pressed.connect(self.setVulnerabilita)
 
-        # QObject.connect(self.btnChooseShellFile_22, SIGNAL("clicked()"), self.setTipoCategoriaBeni)
         self.btnChooseShellFile_22.pressed.connect(self.setTipoCategoriaBeni)
 
         self.checkBox_9.stateChanged.connect(self.setCheckFatalityR)
@@ -224,11 +191,9 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         self.checkBox_13.stateChanged.connect(self.setCheckTipoCategoriaBeni)
         self.checkBox_All_3.stateChanged.connect(self.setCheckAllCsv)
 
-        # QObject.connect(self.btnChooseShellFile_20, SIGNAL("clicked()"), self.caricaCurve)
         self.btnChooseShellFile_20.pressed.connect(self.caricaCurve)
 
         # help
-        # QObject.connect(self.buttonBox, SIGNAL(_fromUtf8("helpRequested()")), self.show_help)
         self.buttonBox.helpRequested.connect(self.show_help)
 
         self.DirDefault = __file__
@@ -268,30 +233,8 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
 
             self.DirDefault=os.path.dirname(self.nomeFileSQlite)    # Setto la Dir di default all'ultimo file caricato
 
-            # ------------------- Carico il database e inserisco i dati nel ComboBox (Exposure Instance) ---------------------------------
-            #conn = sqlite3.connect(self.nomeFileSQlite, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-            #cur = conn.cursor()
-            #sql="SELECT instance, Description from ExposureInstance"
-            #cur.execute(sql)
-            #records=cur.fetchall()
-
-            #self.comboBox_6.clear()
-
-            #for row in records:
-            #    self.comboBox_6.addItem(str(row[0]))
-
-            #self.instance=self.comboBox_6.currentText()
-
-
-            # Close communication with the database
-            #cur.close()
-            #conn.close()
 
     def openSystem(self):
-        # projSelector = QgsGenericProjectionSelector()
-        # projSelector.exec_()
-        # a = projSelector.selectedCrsId()
-        # b = projSelector.selectedAuthId()
 
         projection_selection_widget = QgsProjectionSelectionWidget()
         projection_selection_widget.selectCrs()
@@ -309,7 +252,10 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
 
     def setSistemaRiferimento(self):
         try:
-            conn = db.connect(self.nomeFileSQlite)
+            conn = sqlite3.connect(self.nomeFileSQlite, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+            conn.enable_load_extension(True)
+            conn.execute("SELECT load_extension('mod_spatialite')")
+##            conn = db.connect(self.nomeFileSQlite)
             cur = conn.cursor()
             testoSql = 'UPDATE geometry_columns SET srid=%d' % (self.numEPGS)
             cur.execute(testoSql)
@@ -343,25 +289,11 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         conn.close()
 
 
-##        cursor = conn.execute("SELECT instance, InstanceCode, Description from ExposureInstance")
-##
-##        for row in cursor:
-##            self.p1= str(row[0])
-##            self.p2= str(self.comboBox_6.currentText())
-##
-##            if self.p1 == self.p2:
-##                # self.s1 = str(row[0])                                      # instance
-##                # self.s2 = str(row[1])                                      # InstanceCode
-##                self.s3 = str(row[2])                                      # Descrizione
-##                self.txtDescription.setText(self.s3)                       # Carico la descrizione nel TextBox
-##
-
     def setAreaStudio(self):
         s = QFileDialog.getOpenFileName(None, self.tr("FloodRisk: select Analysis Area shapefile"), self.DirDefault, "FloodRisk File (*.shp)")
         self.nomeFileAreaStud = s[0]
 
         if self.nomeFileAreaStud !="":
-##            self.txtShellFilePath_21.setText(self.nomeFileAreaStud)
             self.comboBox.setEditText(self.nomeFileAreaStud)
             self.FilesListGeoDati[1] = self.nomeFileAreaStud
             self.UpLoadGeoDati[1] = 1
@@ -394,7 +326,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         self.nomeFileBL=s[0]
 
         if self.nomeFileBL !="":
-##            self.txtShellFilePath_19.setText(self.nomeFileBL)
             self.comboBox_5.setEditText(self.nomeFileBL)
             self.FilesListGeoDati[5] = self.nomeFileBL
             self.UpLoadGeoDati[5] = 1
@@ -405,8 +336,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         if state == QtCore.Qt.Checked:
             self.btnChooseShellFile_4.setEnabled(True)
             self.comboBox.setEnabled(True)
-            # listaFile = self.caricaComboBox([QGis.Polygon])
-##            listaFile = self.caricaComboBox([QgsCurvePolygon])
             listaFile = self.caricaComboBox([2])
 
             if len(listaFile) != 0:
@@ -422,10 +351,7 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
             if self.checkAnalysisArea():
                 self.btnChooseShellFile_5.setEnabled(True)
                 self.btnChooseShellFile_11.setEnabled(True)
-##                self.txtShellFilePath_6.setEnabled(True)
-##                self.btnChooseShellFile_9.setEnabled(True)
                 self.comboBox_2.setEnabled(True)
-##                listaFile = self.caricaComboBox([QGis.Polygon])
                 listaFile = self.caricaComboBox([2])
                 if len(listaFile) != 0:
                     self.comboBox_2.clear()
@@ -435,8 +361,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         else:
             self.btnChooseShellFile_5.setEnabled(False)
             self.btnChooseShellFile_11.setEnabled(False)
-##            self.txtShellFilePath_6.setEnabled(False)
-##            self.btnChooseShellFile_9.setEnabled(False)
             self.comboBox_2.setEnabled(False)
             self.comboBox_2.clear()
 
@@ -446,7 +370,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
                 self.btnChooseShellFile_6.setEnabled(True)
                 self.btnChooseShellFile_9.setEnabled(True)
                 self.comboBox_4.setEnabled(True)
-##                listaFile = self.caricaComboBox([QGis.Polygon])
                 listaFile = self.caricaComboBox([2])
 
                 if len(listaFile) != 0:
@@ -466,7 +389,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
                 self.btnChooseShellFile_7.setEnabled(True)
                 self.btnChooseShellFile_10.setEnabled(True)
                 self.comboBox_5.setEnabled(True)
-##                listaFile = self.caricaComboBox([QGis.Line])
                 listaFile = self.caricaComboBox([1])
 
                 if len(listaFile) != 0:
@@ -492,10 +414,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
             self.btnChooseShellFile_11.setEnabled(True)
             self.checkBox_2.setChecked(True)
 
-##            self.txtShellFilePath_6.setEnabled(True)
-##            self.btnChooseShellFile_9.setEnabled(True)
-##            listaFile = self.caricaComboBox([QGis.Polygon])
-##            listaFile2 = self.caricaComboBox([QGis.Line])
             listaFile = self.caricaComboBox([2])
             listaFile2 = self.caricaComboBox([1])
             self.comboBox_5.clear()
@@ -517,8 +435,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
             self.btnChooseShellFile_11.setEnabled(False)
             self.checkBox_2.setChecked(False)
             self.checkBox.setChecked(False)
-##            self.txtShellFilePath_6.setEnabled(False)
-##            self.btnChooseShellFile_9.setEnabled(False)
             self.comboBox_5.clear()
             self.comboBox_4.clear()
             self.comboBox_2.clear()
@@ -708,14 +624,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
             for layer in layermap:
                 layerlist.append(layer.source())
         else:
-            # for name, layer in layermap.iteritems():
-            #    if layer.type() == QgsMapLayer.VectorLayer:
-            #        if layer.geometryType() in vTypes:
-            #            if layer.source()[-3:] == 'shp' :
-            #                layerlist.append( layer.source() )
-            #    elif layer.type() == QgsMapLayer.RasterLayer:
-            #        if "Raster" in vTypes:
-            #            layerlist.append( layer.source() )
 
             for layer in layermap:
                 if layer.type() == QgsMapLayer.VectorLayer:
@@ -726,7 +634,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
                     if "Raster" in vTypes:
                         layerlist.append( layer.source() )
 
-##        return sorted( layerlist, cmp=locale.strcoll )
         return sorted( layerlist)
 
 
@@ -790,12 +697,6 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
         else:
             self.UpLoadGeoDati[2] = 0
 
-##        nomeFileCensimentoXls = self.txtShellFilePath_6.text()
-##        if len(nomeFileCensimentoXls)>0 and self.checkBox_2.isChecked():
-##            self.FilesListGeoDati[3] = nomeFileCensimentoXls
-##            self.UpLoadGeoDati[3] = 1
-##        else:
-##            self.UpLoadGeoDati[3] = 0
         self.UpLoadGeoDati[3] = 0
 
         nomeFileBA = self.comboBox_4.currentText()
@@ -859,7 +760,10 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
 
             try:
                 # connecting the db
-                conn = db.connect(mydb_path)
+                conn = sqlite3.connect(mydb_path, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+                conn.enable_load_extension(True)
+                conn.execute("SELECT load_extension('mod_spatialite')")
+##                conn = db.connect(mydb_path)
                 # creating a Cursor
                 cur = conn.cursor()
                 NomeTabella='analysisarea'
@@ -885,7 +789,11 @@ class CaricaDati_Dialog(QDialog, FORM_CLASS):
 
             if os.path.exists(mydb_path):
                 # creating/connecting the test_db
-                conn = db.connect(mydb_path)
+                conn = sqlite3.connect(mydb_path, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+                conn.enable_load_extension(True)
+                conn.execute("SELECT load_extension('mod_spatialite')")
+
+##                conn = db.connect(mydb_path)
                 # creating a Cursor
                 cur = conn.cursor()
                 NomeTabella='AnalysisArea'

@@ -42,8 +42,7 @@ import sqlite3
 
 spatialRef = osr.SpatialReference()
 
-##from .CreaGridBeni import CalcoloValori
-from .CreaGridBeni_1 import CalcoloValori
+from .CreaGridBeni import CalcoloValori
 
 def CaricaCodedDomains(DBfile):
     consql = sqlite3.connect(DBfile, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)

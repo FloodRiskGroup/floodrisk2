@@ -50,6 +50,27 @@ from urllib.request import urlopen
 
 import json
 
+import subprocess
+import platform
+
+def runGdal(commands):
+
+##    envval = unicode(os.getenv('PATH'))
+
+    loglines = []
+    loglines.append('GDAL execution console output')
+    fused_command = ''.join(['%s ' % c for c in commands])
+    proc = subprocess.Popen(
+        fused_command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stdin=open(os.devnull),
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+    ).stdout
+    for line in iter(proc.readline, ''):
+        loglines.append(line)
+
 def NumEPSGFromOpenGeo(prj_txt):
     #Ok, no luck, lets try with the OpenGeo service
     query = urlencode({'exact' : True, 'error' : True, 'mode' : 'wkt', 'terms' : prj_txt})
@@ -81,7 +102,36 @@ def NewGeom(raw_geom,typeTab,NumEPSG):
     geom = "GeomFromText('%s', %s)" %(new_geom,NumEPSG)
     return geom
 
+def TableInfoList(cur,NomeTabella):
+
+    sql="PRAGMA table_info(%s);" % NomeTabella
+    cur.execute(sql)
+    TableInfoList = cur.fetchall()
+
+    NameField=[]
+    TypeField=[]
+    Field_index={}
+
+    fields_skip=[]
+    fields_skip.append('OBJECTID')
+##    fields_skip.append('Shape_Area')
+##    fields_skip.append('Shape_Length')
+
+    for rec in TableInfoList:
+##        Field_index[rec[1]]=rec[0]
+        # do not count OBJECTID
+        Field_index[rec[1]]=rec[0]-1
+        # do not load OBJECTID, ... field
+        if rec[1] in fields_skip:
+            pass
+        else:
+            NameField.append(rec[1])
+            TypeField.append(rec[2])
+
+    return NameField,TypeField,Field_index
+
 def CampiTabella(sql):
+
     nn=str.find(sql,'(')+1
     pp1=sql[nn:-1]
     campi=str.split(pp1,',')
@@ -148,12 +198,116 @@ def GeomColumn(TipoCampo,NomeCampo):
 
     return tipo, ColGeom
 
+def UploadLayerInSQL_ogr2ogr(FileShp,NomeTabella,mydb_path,InputEPSG,TargetEPSG,fieldmap):
+
+    # release using -fieldmap
+
+    Err=0
+    errMsg='OK'
+
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+
+    if os.path.exists(FileShp):
+        shpfileDS = driver.Open(FileShp, 0)
+        if shpfileDS is None:
+          errMsg= 'Could not open %s' % FileShp
+          Err=1
+        else:
+            # carico il layer
+            InLayer = shpfileDS.GetLayer()
+
+            # creo una copia dello shapefile in una dir temporanea
+            dirtmp=os.path.dirname(mydb_path)+os.sep+'tmp'
+            if not os.path.exists(dirtmp):
+                os.mkdir(dirtmp)
+            filtmp=dirtmp+os.sep+'%s.shp' % NomeTabella
+            filtmp=os.path.realpath(filtmp)
+            if os.path.exists(filtmp):
+                driver.DeleteDataSource(filtmp)
+
+            outds = driver.CreateDataSource( filtmp )
+            outlyr = outds.CopyLayer(InLayer,str(NomeTabella))
+
+            outds.Destroy()
+            shpfileDS.Destroy()
+            del outds
+            del InLayer
+
+            conn = sqlite3.connect(mydb_path, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+
+            # import extention
+            conn.enable_load_extension(True)
+            conn.execute('SELECT load_extension("mod_spatialite")')
+
+            # creating a Cursor
+            cur = conn.cursor()
+
+            sql="SELECT geometry_type FROM geometry_columns WHERE f_table_name='%s';" % (str(NomeTabella).lower())
+            cur.execute(sql)
+            geometry_type=cur.fetchone()[0]
+
+
+            cur.execute("BEGIN;")
+            comando=' -update -append'
+
+            # Continue after a failure, skipping the failed feature
+            comando+=' -skipfailures'
+
+            # Clip geometries
+            sql="SELECT AsText(geom) FROM AnalysisArea;"
+            comando+=' -clipsrcsql "%s"' % sql
+
+            # aggiunge la field map
+            comando+=' -fieldmap '
+            for index in fieldmap:
+                comando+='%s,' % index
+            # elimino l'ultima virgola
+            comando=comando[:-1]
+
+
+            # controllo se multi
+            if geometry_type>3:
+                comando+=' -nlt PROMOTE_TO_MULTI'
+            # per prevenire i casi di shapefile 3D
+            comando+=' -dim XY'
+            # effettua la trasformazione di coordinate
+            if InputEPSG!=TargetEPSG:
+                comando+=' -t_srs EPSG:%s' % TargetEPSG
+            comando+=' -f SQlite "%s" -dsco SPATIALITE=YES' % mydb_path
+            comando+=' "%s" %s' %(filtmp,NomeTabella)
+
+            commands=[]
+
+            if platform.system() == 'Windows':
+                commands = ['cmd.exe', '/C ', 'ogr2ogr.exe',
+                            comando]
+            else:
+                commands = ['ogr2ogr',comando]
+
+##            print (commands)
+
+            runGdal(commands)
+
+            conn.commit()
+
+            #chiudo la connessione a Spatialite
+            conn.close()
+
+            if os.path.exists(filtmp):
+                driver.DeleteDataSource(filtmp)
+            if os.path.exists(dirtmp):
+                os.rmdir(dirtmp)
+
+    return Err,errMsg
+
 def UploadLayerInSQL(layer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,TypeField,dic_fiels,CampiInsert,typeTab,ListaSql, bar,instance):
 
     # load a layer in memory and write a SQL file
     # --------------------------------------------
 
-    Err='ok'
+    NotErr=bool('True')
+    errMsg='OK'
+
     dic = {1:'POINT', 2:'LINESTRING', 3:'POLYGON', 5:'MULTILINESTRING', 6:'MULTIPOLYGON'}
     feat_defn = layer.GetLayerDefn()
     NumFieldsShp=feat_defn.GetFieldCount()
@@ -235,6 +389,8 @@ def UploadLayerInSQL(layer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,TypeFiel
 
                 try:
                     geometry = feat.GetGeometryRef()
+                    # flattering
+                    geometry.FlattenTo2D()
 
                     if trasformare:
                         geometry.Transform(coordTrans)
@@ -244,6 +400,7 @@ def UploadLayerInSQL(layer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,TypeFiel
                     if intersezione:
                         inters=geometry.Intersection(GeomStudy)
                         raw_geom= inters.ExportToWkt()
+
                     else:
                         raw_geom= geometry.ExportToWkt()
 
@@ -311,7 +468,7 @@ def UploadLayerInSQL(layer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,TypeFiel
                 sql += ");"
 
             ListaSql.append(sql)
-            feat.Destroy()
+            #feat.Destroy()
             kk = kk+1
             numCur = int(ini + dx * kk)
             bar.setValue(numCur)
@@ -319,7 +476,7 @@ def UploadLayerInSQL(layer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,TypeFiel
 
     bar.setValue(40)
 
-    return Err
+    return NotErr, errMsg
 
 
 def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
@@ -460,9 +617,13 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
         ListaSql=[]
         GeomAreawkt=''
         bar.setValue(10)
-        UploadLayer=UploadLayerInSQL(Inlayer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,
+        NotErr, errMsg =UploadLayerInSQL(Inlayer,TargetEPSG,GeomAreawkt,NomeTabella,NameField,
         TypeField,dic_fiels,CampiInsert,TipoGeom,ListaSql, bar,instance)
         bar.setValue(60)
+
+        if not NotErr:
+            return NotErr, errMsg
+
 
         ini = 60.0
         fin = 99.0
@@ -522,20 +683,12 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
     carico=UpLoad[2]
 
     if carico>0:
-        bar.setValue(0)
-        NomeTabella='CensusBlocks'
-        sql="SELECT sql FROM sqlite_master WHERE type='table' AND name='%s';" % (NomeTabella)
-        cur.execute(sql)
-        Tabella=str(cur.fetchone()[0])
-        NameField=[]
-        TypeField=[]
-        NameField, TypeField = CampiTabella(Tabella)
 
-        # do not load OBJECTID field
-        if 'OBJECTID' in NameField:
-            indiceid=NameField.index('OBJECTID')
-            NameField.remove('OBJECTID')
-            TypeField.remove(TypeField[indiceid])
+        bar.setValue(0)
+
+        NomeTabella='CensusBlocks'
+
+        NameField,TypeField,Field_index =TableInfoList(cur,NomeTabella)
 
         NumFields=len(NameField)
         Null='Null'
@@ -574,7 +727,6 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
                 NumEPSG= int(NumEPSG)
             except:
                 pass
-
 
         SpatialFilter=ogr.CreateGeometryFromWkt(GeomAreawkt)
 
@@ -636,43 +788,31 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
                         CampiInsert.append(NameFieldShp[j])
                         break
 
+            # index of the field in the target layer definition
+            # --------------------------------------------------
+            fieldmap=[]
+            for j in range(NumFieldsShp):
+                if NameFieldShp[j] in CampiInsert:
+                    fieldmap.append(Field_index[dic_fiels[NameFieldShp[j]]])
+                else:
+                    fieldmap.append(-1)
+
             bar.setValue(10)
 
-            #need if looping again
-            Inlayer.ResetReading()
 
-            ListaSql=[]
-
-            layermem=UploadLayerInSQL(Inlayer,NumEPSGAreaStudio,GeomAreawkt,
-            NomeTabella,NameField,TypeField,dic_fiels,CampiInsert,TipoGeom,
-            ListaSql, bar,instance)
-            bar.setValue(60)
+            # Close the data source
             inDS=None
-            nn=len(ListaSql)
 
-            if nn>0:
-                n1=40.0/float(nn)
-            else:
-                n1=0.0
+            InputEPSG=NumEPSG
+            TargetEPSG=NumEPSGAreaStudio
+            NotErr, errMsg=UploadLayerInSQL_ogr2ogr(fn,NomeTabella,mydb_path,InputEPSG,TargetEPSG,fieldmap)
 
-            kkk=0
+            # update instance field
+            sql="UPDATE %s SET instance=%d"  % (NomeTabella,instance)
+            sql+=' WHERE instance IS NULL'
+            sql+=';'
+            cur.execute(sql)
 
-            for sql in ListaSql:
-                kkk=kkk+1
-
-                try:
-                    cur.execute(sql)
-                    nnn=60+int(float(kkk)*n1)
-
-                    if nnn<100:
-                        bar.setValue(nnn)
-
-                except:
-                    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-                    errMsg= "Table %s  Error! ->%s" % (NomeTabella,exceptionValue)
-                    errMsg=exceptionValue
-                    NotErr=bool()
-                    return NotErr, errMsg
 
             conn.commit()
             bar.setValue(100)
@@ -827,20 +967,26 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
     carico=UpLoad[4]
 
     if carico>0:
+
         fn=ShpBeniAreali
         NomeTabella='StructurePoly'
-        sql="SELECT sql FROM sqlite_master WHERE type='table' AND name='%s';" % (NomeTabella)
-        cur.execute(sql)
-        Tabella=str(cur.fetchone()[0])
-        NameField=[]
-        TypeField=[]
-        NameField, TypeField = CampiTabella(Tabella)
 
-        # do not load OBJECTID field
-        if 'OBJECTID' in NameField:
-            indiceid=NameField.index('OBJECTID')
-            NameField.remove('OBJECTID')
-            TypeField.remove(TypeField[indiceid])
+        NameField,TypeField,Field_index =TableInfoList(cur,NomeTabella)
+
+
+
+##        sql="SELECT sql FROM sqlite_master WHERE type='table' AND name='%s';" % (NomeTabella)
+##        cur.execute(sql)
+##        Tabella=str(cur.fetchone()[0])
+##        NameField=[]
+##        TypeField=[]
+##        NameField, TypeField = CampiTabella(Tabella)
+##
+##        # do not load OBJECTID field
+##        if 'OBJECTID' in NameField:
+##            indiceid=NameField.index('OBJECTID')
+##            NameField.remove('OBJECTID')
+##            TypeField.remove(TypeField[indiceid])
 
         NumFields=len(NameField)
         Null='Null'
@@ -1002,29 +1148,61 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
             sql = 'DELETE FROM %s WHERE instance=%d;' % (NomeTabella,instance)
             cur.execute(sql)
             conn.commit()
-            ListaSql=[]
-            layermem=UploadLayerInSQL(Inlayer,NumEPSGAreaStudio,GeomAreawkt,
-            NomeTabella,NameField,TypeField,dic_fiels,CampiInsert,TipoGeom,
-            ListaSql, bar,instance)
-            inDS=None
-            ini = 40.0
-            fin = 99.0
-            numRighe = len(ListaSql)
-            dx = (fin - ini) / float(numRighe)
-            kk = 0
 
-            for sql in ListaSql:
-                try:
-                    cur.execute(sql)
-                    kk = kk+1
-                    numCur = int(ini + dx * kk)
-                    bar.setValue(numCur)
-                except:
-                    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-                    errMsg= "Table %s  Error! ->%s" % (NomeTabella,exceptionValue)
-                    #exit with an error code
-                    NotErr=bool()
-                    return NotErr, errMsg
+
+            # index of the field in the target layer definition
+            # --------------------------------------------------
+            fieldmap=[]
+            for j in range(NumFieldsShp):
+                if NameFieldShp[j] in CampiInsert:
+                    fieldmap.append(Field_index[dic_fiels[NameFieldShp[j]]])
+                else:
+                    fieldmap.append(-1)
+
+            bar.setValue(10)
+
+
+            # Close the data source
+            inDS=None
+
+            InputEPSG=NumEPSG
+            TargetEPSG=NumEPSGAreaStudio
+            NotErr, errMsg=UploadLayerInSQL_ogr2ogr(fn,NomeTabella,mydb_path,InputEPSG,TargetEPSG,fieldmap)
+
+            # update instance field
+            sql="UPDATE %s SET instance=%d"  % (NomeTabella,instance)
+            sql+=' WHERE instance IS NULL'
+            sql+=';'
+            cur.execute(sql)
+
+##
+##            ListaSql=[]
+##            NotErr, errMsg=UploadLayerInSQL(Inlayer,NumEPSGAreaStudio,GeomAreawkt,
+##            NomeTabella,NameField,TypeField,dic_fiels,CampiInsert,TipoGeom,
+##            ListaSql, bar,instance)
+##
+##            if not NotErr:
+##                return NotErr, errMsg
+##
+##            inDS=None
+##            ini = 40.0
+##            fin = 99.0
+##            numRighe = len(ListaSql)
+##            dx = (fin - ini) / float(numRighe)
+##            kk = 0
+##
+##            for sql in ListaSql:
+##                try:
+##                    cur.execute(sql)
+##                    kk = kk+1
+##                    numCur = int(ini + dx * kk)
+##                    bar.setValue(numCur)
+##                except:
+##                    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+##                    errMsg= "Table %s  Error! ->%s" % (NomeTabella,exceptionValue)
+##                    #exit with an error code
+##                    NotErr=bool()
+##                    return NotErr, errMsg
 
             conn.commit()
             bar.setValue(100)
@@ -1038,18 +1216,8 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
     if carico>0:
         fn=ShpBeniLineari
         NomeTabella='InfrastrLines'
-        sql="SELECT sql FROM sqlite_master WHERE type='table' AND name='%s';" % (NomeTabella)
-        cur.execute(sql)
-        Tabella=str(cur.fetchone()[0])
-        NameField=[]
-        TypeField=[]
-        NameField, TypeField = CampiTabella(Tabella)
 
-        # do not load OBJECTID field
-        if 'OBJECTID' in NameField:
-            indiceid=NameField.index('OBJECTID')
-            NameField.remove('OBJECTID')
-            TypeField.remove(TypeField[indiceid])
+        NameField,TypeField,Field_index =TableInfoList(cur,NomeTabella)
 
         NumFields=len(NameField)
         Null='Null'
@@ -1217,29 +1385,31 @@ def mainCaricaGeodatiFloodRisk(self,FilesList,UpLoad, bar,instance):
             sql = 'DELETE FROM %s WHERE instance=%d;' % (NomeTabella,instance)
             cur.execute(sql)
             conn.commit()
-            ListaSql=[]
-            layermem=UploadLayerInSQL(Inlayer,NumEPSGAreaStudio,GeomAreawkt,
-            NomeTabella,NameField,TypeField,dic_fiels,CampiInsert,TipoGeom,
-            ListaSql, bar,instance)
-            inDS=None
-            ini = 40.0
-            fin = 99.0
-            numRighe = len(ListaSql)
-            dx = (fin - ini) / float(numRighe)
-            kk = 0
 
-            for sql in ListaSql:
-                try:
-                    cur.execute(sql)
-                    kk = kk+1
-                    numCur = int(ini + dx * kk)
-                    bar.setValue(numCur)
-                except:
-                    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-                    errMsg= "Table %s  Error! ->%s" % (NomeTabella,exceptionValue)
-                    #exit with an error code
-                    NotErr=bool()
-                    return NotErr, errMsg
+            # index of the field in the target layer definition
+            # --------------------------------------------------
+            fieldmap=[]
+            for j in range(NumFieldsShp):
+                if NameFieldShp[j] in CampiInsert:
+                    fieldmap.append(Field_index[dic_fiels[NameFieldShp[j]]])
+                else:
+                    fieldmap.append(-1)
+
+            bar.setValue(10)
+
+
+            # Close the data source
+            inDS=None
+
+            InputEPSG=NumEPSG
+            TargetEPSG=NumEPSGAreaStudio
+            NotErr, errMsg=UploadLayerInSQL_ogr2ogr(fn,NomeTabella,mydb_path,InputEPSG,TargetEPSG,fieldmap)
+
+            # update instance field
+            sql="UPDATE %s SET instance=%d"  % (NomeTabella,instance)
+            sql+=' WHERE instance IS NULL'
+            sql+=';'
+            cur.execute(sql)
 
             conn.commit()
             bar.setValue(100)

@@ -33,8 +33,6 @@ from qgis.core import *
 from qgis.gui import *
 # ============================================================================================
 
-# from ui_calcolodanno import Ui_FloodRisk
-# import CalcoloDannoInondazione
 
 from xml.dom import minidom
 from xml.dom.minidom import Document
