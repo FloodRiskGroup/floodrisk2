@@ -31,8 +31,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 # ============================================================================================
 
-##import CreaGeodatabase
-
 # import Graph_curve_FD
 from .Graph_curve_FD import mainFD
 
@@ -45,12 +43,10 @@ from .Graph_curve_ED import mainED
 # import Graph_curve_PD
 from .Graph_curve_PD import mainPD
 
-# from qgis.gui import QgsGenericProjectionSelector             # ????????????????
-# from pyspatialite import dbapi2 as db
 from time import sleep
 
 from .help import show_context_help
-from numpy.distutils.fcompiler import none
+##from numpy.distutils.fcompiler import none
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
